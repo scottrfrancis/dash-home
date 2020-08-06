@@ -36,3 +36,46 @@
     transform: rotate(360deg);
   }
 }
+
+amplify-authenticator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  height: 100vh;
+}
+
+table {
+  background-color: #555555;
+  font-size: 6px;
+  border: none;
+  border-collapse: collapse;
+  margin-left:6px;
+  margin-right: auto
+}
+
+thead {
+  background-color: darkKhaki;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+th, td {
+  padding: 2px;
+  text-align: left;
+}
+
+th {
+  font-family: sans-serif;
+  font-weight: bolder;
+}
+
+td {
+  font-family: monospace;
+}

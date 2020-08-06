@@ -1,26 +1,29 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import { Col, Container, Row } from 'react-bootstrap'
+import './App.css'
+import Amplify from 'aws-amplify'
+import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react'
+import Dashboard from './Dashboard'
+import awsconfig from './aws-exports'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
 
-export default App;
+
+Amplify.configure(awsconfig)
+
+const App = () => (
+  <Container fluid="md">
+  <Row>
+    <Col xs />
+    <Col md="auto">
+      <Row><Col><h1>Home Dashboard</h1></Col><Col><AmplifySignOut /></Col></Row>
+      <Row/>
+      <Row>
+          <Dashboard thingName="pool" />
+      </Row>
+    </Col>
+    <Col xs />
+  </Row>
+  </Container>
+)
+
+export default withAuthenticator(App)
