@@ -1,6 +1,6 @@
 import { Auth } from 'aws-amplify'
 import React, { Component } from 'react'
-import { Button, Card, Col, Container, Row } from "react-bootstrap";
+import { Card, Col, Container, Row } from "react-bootstrap";
 import AWS from 'aws-sdk'
 import awsconfig from './aws-exports'
 import awsiot from './aws-iot'
@@ -28,12 +28,19 @@ class SwitchCard extends Component {
     })
   }
   
+  handleChange = (checked) => {
+    // this.setState({ checked });
+    
+    (this.props.doUpdate && this.props.doUpdate(this.props.id, checked))
+  }
+  
+  
   render() {
     return (
       <Card bg='light'>
         <Card.Title>{this.props.title}</Card.Title>
         <Card.Body>
-          <Switch checked={this.state.checked} className='react-switch' />
+          <Switch onChange={this.handleChange} checked={this.state.checked} className='react-switch' />
         </Card.Body>
       </Card>
     )
@@ -283,6 +290,13 @@ class Dashboard extends Component {
     return metrics
   }
 
+  updateCircuit = (ckt, state) => {
+    console.log("updating " + ckt + " to be " + state)
+    
+    let newState = {state: {desired: {}}}
+    newState.state.desired[ckt] = state
+    this.clientTokenUpdate = this.shadows.update(this.props.thingName, newState)
+  }
 
   render() {
     const tLabels = this.state.metrics; 
@@ -328,6 +342,11 @@ class Dashboard extends Component {
         </Card>
       )
       
+      const purpleAirCard = (
+          <div id='PurpleAirWidget_3894_module_AQI_conversion_C0_average_10_layer_standard'>Loading PurpleAir Widget...</div>
+        )
+
+      
       statusStrip = (
         <Row>
         <Col>{airCard}</Col><Col>{pumpCard}</Col><Col>{poolCard}</Col><Col>{spaCard}</Col>
@@ -335,19 +354,24 @@ class Dashboard extends Component {
       )      
     
       const poolLightCard = (
-        <SwitchCard title="Pool Light" checked={m['aux2']} />
+        <SwitchCard title="Pool Light" 
+          checked={m['aux2']} 
+          id='aux2' doUpdate={this.updateCircuit} />
       )
       
       const spaLightCard = (
-        <SwitchCard title="Spa Light" checked={m['aux3']} />
+        <SwitchCard title="Spa Light" checked={m['aux3']} 
+          id='aux3' doUpdate={this.updateCircuit}/>
       )
       
       const cleanerCard = (
-        <SwitchCard title="Waldo" checked={m['aux1']} />
+        <SwitchCard title="Waldo" checked={m['aux1']} 
+        id='aux1' doUpdate={this.updateCircuit}/>
       )
       
       const jetsCard = (
-        <SwitchCard title="Spa Jets" checked={m['feature1']} />
+        <SwitchCard title="Spa Jets" checked={m['feature1']}
+        id='feature1' doUpdate={this.updateCircuit}/>
       )
 
       const controlStrip = (
@@ -358,36 +382,31 @@ class Dashboard extends Component {
 
       
       return (
-        <div>
-          <Container fluid>
-            <Row />
-            {statusStrip}
-            <Row />
-            {controlStrip}
+        <Container fluid>
+          <Row />
           <Row>
+            <Col>{purpleAirCard}</Col>
+            <Col>
+              <Row><Col>{airCard}</Col></Row>
+              <Row><Col>{poolCard}</Col></Row>
+              <Row><Col>{spaCard}</Col></Row>
+            </Col>
           </Row>
-          </Container>
-        
-            <div>
-              <br />
-              <table>
-                <thead>
-                  <tr>
-                    {(tLabels.length > 1) && tLabels
-                      .map((m, j) => {return(<th key={j}>{m}</th>)})}
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.state.messages.map((t,i) => {
-                    return(
-                      <tr key={i}>{tLabels.map((m, j) => {
-                          return(<td key={j}>{t[m].toString()}</td>)
-                        })}
-                    </tr>)})}
-                </tbody>
-              </table>
-            </div>
-        </div>
+          <Row />
+          <Row>
+            <Col>{pumpCard}</Col>
+            <Col>
+              <Row>
+                <Col>{cleanerCard}</Col><Col>{poolLightCard}</Col>
+              </Row>
+              <Row>
+                <Col>{jetsCard}</Col><Col>{spaLightCard}</Col>
+              </Row>
+            </Col>
+          </Row>
+          
+          <Row />
+        </Container>
       )
     }
   }
